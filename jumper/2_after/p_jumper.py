@@ -27,10 +27,12 @@ class Player(pygame.sprite.Sprite):
 
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
+        # Jumper
         width = 40
         height = 60
         self.image = pygame.Surface([width, height])
-        self.image.fill(RED)
+        # self.image.fill(RED)
+        self.image = pygame.image.load('pingwin40x60alpha.png').convert_alpha()
 
         # Set a referance to the image rect.
         self.rect = self.image.get_rect()
@@ -126,8 +128,9 @@ class Platform(pygame.sprite.Sprite):
             code. """
         super().__init__()
 
-        self.image = pygame.Surface([width, height])
-        self.image.fill(GREEN)
+        # self.image = pygame.Surface([width, height])
+        # self.image.fill(GREEN)
+        self.image = pygame.image.load('cloud_platform.png')
 
         self.rect = self.image.get_rect()
 
@@ -145,7 +148,7 @@ class Level(object):
         self.player = player
 
         # Background image
-        self.background = None
+        self.background = pygame.image.load("arctic_background.jpg").convert()
 
     # Update everythign on this level
     def update(self):
@@ -158,6 +161,7 @@ class Level(object):
 
         # Draw the background
         screen.fill(BLUE)
+        screen.blit(self.background, [0, 0])
 
         # Draw all the sprite lists that we have
         self.platform_list.draw(screen)
@@ -195,9 +199,10 @@ def main():
 
     # Set the height and width of the screen
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
+    # Open a window
     screen = pygame.display.set_mode(size)
+    pygame.display.set_caption("Penguin Jumper")
 
-    pygame.display.set_caption("Platformer Jumper")
 
     # Create the player
     player = Player()
