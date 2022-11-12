@@ -1,4 +1,5 @@
 import pygame
+from random import randrange
 
 pygame.init()
 
@@ -120,7 +121,7 @@ for platform in platforms:
     platform_list.add(block)
 
 coin_list = pygame.sprite.Group()
-from random import randrange
+
 def mine_coin(coin_list, platforms):
     random_place = randrange( len(platforms))
     pos = platforms[random_place]
@@ -130,6 +131,8 @@ def mine_coin(coin_list, platforms):
     coin_list.add(coin)
 
 mine_coin(coin_list, platforms)
+main_font = pygame.font.SysFont("comicsans", 50)
+coin_count = 0
 
 while not done:
     clock.tick(FPS)
@@ -150,8 +153,17 @@ while not done:
             player.stop()
 
     active_sprite_list.update()
+
+    hits = pygame.sprite.spritecollide(player, coin_list, False)
+    if hits:
+        coin_count += 1
+        coin_list.remove(hits)
+        mine_coin(coin_list, platforms)
+
     # GAME_WIN.fill(MINT)
     GAME_WIN.blit(BG_IMAGE, (0, 0))
+    coin_label = main_font.render(f"Coins: {coin_count}", 1, BROWN)
+    GAME_WIN.blit(coin_label, (10, 10))
     platform_list.draw(GAME_WIN)
     coin_list.draw(GAME_WIN)
     active_sprite_list.draw(GAME_WIN)
