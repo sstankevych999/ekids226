@@ -9,6 +9,16 @@ SCREEN_HEIGTH = 600
 BG_IMAGE = pygame.image.load("arctic_background.jpg")
 PLATFORM_IMAGE = pygame.image.load("cloud_platform.png")
 PlAYER_IMAGE = pygame.image.load("tux40x60alpha.png")
+COIN_IMAGE = pygame.image.load("coin-silver.png")
+
+SCREEN_WIDHT = 1323
+BG_IMAGE = pygame.image.load("background1223.png")
+BG_IMAGE = pygame.transform.scale(BG_IMAGE, (SCREEN_WIDHT, SCREEN_HEIGTH))
+PLATFORM_IMAGE = pygame.image.load("stone-platform210.png")
+PlAYER_IMAGE = pygame.image.load("minion.png")
+PlAYER_IMAGE = pygame.transform.scale(PlAYER_IMAGE, (30, 60))
+COIN_IMAGE = pygame.image.load("coin-gold.png")
+
 
 YELLOW = (255, 255, 0)
 MINT = (62, 180, 137)
@@ -86,7 +96,7 @@ class Coin(pygame.sprite.Sprite):
         w , h = 30, 30
         self.image = pygame.Surface([w, h])
         self.image.fill(YELLOW)
-        # self.image = PLATFORM_IMAGE
+        self.image = COIN_IMAGE.convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
