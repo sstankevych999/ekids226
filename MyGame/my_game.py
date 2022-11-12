@@ -1,12 +1,13 @@
-# GitHub:
-# https://github.com/sstankevych999/ekids226/blob/main/MyGame/my_game.py
-#
 import pygame
 
 pygame.init()
 
 SCREEN_WIDHT = 800
 SCREEN_HEIGTH = 600
+
+BG_IMAGE = pygame.image.load("arctic_background.jpg")
+PLATFORM_IMAGE = pygame.image.load("cloud_platform.png")
+PlAYER_IMAGE = pygame.image.load("tux40x60alpha.png")
 
 YELLOW = (255, 255, 0)
 MINT = (62, 180, 137)
@@ -19,13 +20,16 @@ class Player(pygame.sprite.Sprite):
         heigth = 60
         self.image = pygame.Surface( (width, heigth) )
         self.image.fill(YELLOW)
+        self.image = PlAYER_IMAGE.convert_alpha()
         self.rect = self.image.get_rect()
         self.change_x = 0
         self.change_y = 0
 
     def jump(self):
         self.rect.y += 2
-        if self.rect.bottom >= SCREEN_HEIGTH:
+        platform_hit_list = pygame.sprite.spritecollide(self, platform_list, False)
+        self.rect.y -= 2
+        if len(platform_hit_list) > 0 or self.rect.bottom >= SCREEN_HEIGTH:
             self.change_y = -10
 
     def go_left(self):
@@ -49,9 +53,42 @@ class Player(pygame.sprite.Sprite):
             self.rect.y = SCREEN_HEIGTH - self.rect.height
 
     def update(self):
-         self.calc_grav()
-         self.rect.x += self.change_x
-         self.rect.y += self.change_y
+        self.calc_grav()
+        self.rect.x += self.change_x
+        block_hit_list = pygame.sprite.spritecollide(self, platform_list, False)
+        for block in block_hit_list:
+            if self.change_x > 0:
+             self.rect.right = block.rect.left
+            elif self.change_x < 0:
+             self.rect.x = block.rect.right
+
+        self.rect.y += self.change_y
+        block_hit_list = pygame.sprite.spritecollide(self, platform_list, False)
+        for block in block_hit_list:
+            if self.change_y > 0:
+                self.rect.bottom = block.rect.top
+            elif self.change_y < 0:
+                self.rect.top = block.rect.bottom
+
+
+class Platform(pygame.sprite.Sprite):
+    def __init__(self, width, height):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface([width, height])
+        self.image.fill(BROWN)
+        self.image = PLATFORM_IMAGE
+        self.rect = self.image.get_rect()
+
+class Coin(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        w , h = 30, 30
+        self.image = pygame.Surface([w, h])
+        self.image.fill(YELLOW)
+        # self.image = PLATFORM_IMAGE
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
 # bg_sound = pygame.mixer.Sound("game_bg_sound.wav")
 # bg_sound.play()
@@ -68,7 +105,31 @@ player.rect.y = SCREEN_HEIGTH - player.rect.height
 
 active_sprite_list = pygame.sprite.Group()
 active_sprite_list.add(player)
+platform_list = pygame.sprite.Group()
 
+platforms = [
+    [210,70, 500,500],
+    [210,70, 200,400],
+    [210,70, 600,300],
+    [210,70, 180,200]
+]
+for platform in platforms:
+    block = Platform(platform[0], platform[1])
+    block.rect.x = platform[2]
+    block.rect.y = platform[3]
+    platform_list.add(block)
+
+coin_list = pygame.sprite.Group()
+from random import randrange
+def mine_coin(coin_list, platforms):
+    random_place = randrange( len(platforms))
+    pos = platforms[random_place]
+    x = pos[2] + randrange(pos[0])
+    y = pos[3] - 100
+    coin = Coin(x, y)
+    coin_list.add(coin)
+
+mine_coin(coin_list, platforms)
 
 while not done:
     clock.tick(FPS)
@@ -89,7 +150,10 @@ while not done:
             player.stop()
 
     active_sprite_list.update()
-    GAME_WIN.fill(MINT)
+    # GAME_WIN.fill(MINT)
+    GAME_WIN.blit(BG_IMAGE, (0, 0))
+    platform_list.draw(GAME_WIN)
+    coin_list.draw(GAME_WIN)
     active_sprite_list.draw(GAME_WIN)
 
 
